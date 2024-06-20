@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Clientes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <h2>Listado de Clientes</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Dirección</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+            </tr>
+        </thead>
+        <tbody id="clientesTableBody">
+        </tbody>
+    </table>
+    <p id="errorMessage" class="error-message"></p>
+</div>
+
+<script>
+    const url = 'http://localhost/sqlite-pull/php/leer-clientes.php';
+
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Error al cargar los clientes.');
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.clientes && data.clientes.length > 0) {
+                mostrarClientes(data.clientes);
+            } else {
+                mostrarMensajeError('No se encontraron clientes.');
+            }
+        })
+        .catch(function(error) {
+            mostrarMensajeError(error.message);
+        });
+
+    // Función para mostrar los clientes en la tabla
+    function mostrarClientes(clientes) {
+        const tableBody = document.getElementById('clientesTableBody');
+        tableBody.innerHTML = ''; 
+
+        clientes.forEach(function(cliente) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${cliente.id}</td>
+                <td>${cliente.nombre}</td>
+                <td>${cliente.direccion}</td>
+                <td>${cliente.correo}</td>
+                <td>${cliente.telefono}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Función para mostrar mensajes de error
+    function mostrarMensajeError(mensaje) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = mensaje;
+    }
+</script>
+
+</body>
+</html>

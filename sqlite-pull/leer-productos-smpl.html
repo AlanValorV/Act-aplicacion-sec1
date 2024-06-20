@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Productos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div>
+    <h2>Listado de Productos</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock Disponible</th>
+            </tr>
+        </thead>
+        <tbody id="productosTableBody">
+        </tbody>
+    </table>
+    <p id="errorMessage" class="error-message"></p>
+</div>
+
+<script>
+    const url = 'http://localhost/sqlite-pull/php/leer-productos.php';
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Error al cargar los productos.');
+            }
+            return response.json();
+        })
+        .then(function(data) {
+            if (data.productos && data.productos.length > 0) {
+                mostrarProductos(data.productos);
+            } else {
+                mostrarMensajeError('No se encontraron productos.');
+            }
+        })
+        .catch(function(error) {
+            mostrarMensajeError(error.message);
+        });
+
+    function mostrarProductos(productos) {
+        const tableBody = document.getElementById('productosTableBody');
+        tableBody.innerHTML = ''; 
+
+        productos.forEach(function(producto) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${producto.id}</td>
+                <td>${producto.nombre}</td>
+                <td>${producto.descripcion}</td>
+                <td>${producto.precio}</td>
+                <td>${producto.stock}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    // Función para mostrar mensajes de error
+    function mostrarMensajeError(mensaje) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = mensaje;
+    }
+</script>
+
+</body>
+</html>
